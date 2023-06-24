@@ -5,3 +5,4 @@ dash
 dash_bootstrap_components
 psycopg2
 web3
+dotenv
