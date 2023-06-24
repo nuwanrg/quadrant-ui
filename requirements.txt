@@ -1,4 +1,6 @@
-pip
+pip==21.0.1
+setuptools==51.0.0
+python-dotenv==0.19.1
 Flask
 pandas
 dash
