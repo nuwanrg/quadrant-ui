@@ -1,0 +1,7 @@
+pip==23.0.1
+Flask==2.2.2
+pandas
+dash
+dash_bootstrap_components
+psycopg2
+web3
