@@ -1,5 +1,5 @@
-pip==23.0.1
-Flask==2.2.2
+pip
+Flask
 pandas
 dash
 dash_bootstrap_components
