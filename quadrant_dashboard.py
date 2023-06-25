@@ -19,99 +19,86 @@ POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
 DB_PORT=os.getenv("DB_PORT")
 
 
-# Establish a connection to the database
-# conn = psycopg2.connect(
-#     dbname=POSTGRES_DBNAME,
-#     user=POSTGRES_USER,
-#     password=POSTGRES_PASSWORD,
-#     host=POSTGRES_HOST
-# )
+#Establish a connection to the database
+conn = psycopg2.connect(
+    dbname=POSTGRES_DBNAME,
+    user=POSTGRES_USER,
+    password=POSTGRES_PASSWORD,
+    host=POSTGRES_HOST
+)
 
 #Retrieve nfts for user wallet
-# def getNftsByWallet(wallet_address):
-#     # Create a cursor object
-#     cur = conn.cursor()
-
-#     try:
-#         # Prepare a query
-#         query = f"SELECT token_uri FROM nfts WHERE recipient_wallet = %s"
-
-#         # Execute the query
-#         cur.execute(query, (wallet_address,))
-
-#         # Fetch all rows
-#         token_uris = cur.fetchall()
-
-#         # Convert the result into a flat list
-#         token_uris = [item[0] for item in token_uris]
-#         # print('token_uris', token_uris)
-#     except Exception as e:
-#         print(f"Error: {e}")
-#         token_uris = []
-
-#     return token_uris
-
 def getNftsByWallet(wallet_address):
+    # Create a cursor object
+    cur = conn.cursor()
+
     try:
-        # Establish a connection to the database
-        with psycopg2.connect(
-            dbname=POSTGRES_DBNAME,
-            user=POSTGRES_USER,
-            password=POSTGRES_PASSWORD,
-            host=POSTGRES_HOST
-        ) as conn:
+        # Prepare a query
+        query = f"SELECT token_uri FROM nfts WHERE recipient_wallet = %s"
 
-            # Create a cursor object
-            with conn.cursor() as cur:
+        # Execute the query
+        cur.execute(query, (wallet_address,))
 
-                # Prepare a query
-                query = f"SELECT token_uri FROM nfts WHERE recipient_wallet = %s"
+        # Fetch all rows
+        token_uris = cur.fetchall()
 
-                # Execute the query
-                cur.execute(query, (wallet_address,))
-
-                # Fetch all rows
-                token_uris = cur.fetchall()
-
-                # Convert the result into a flat list
-                token_uris = [item[0] for item in token_uris]
-
+        # Convert the result into a flat list
+        token_uris = [item[0] for item in token_uris]
+        # print('token_uris', token_uris)
     except Exception as e:
         print(f"Error: {e}")
         token_uris = []
 
     return token_uris
 
+# def getNftsByWallet(wallet_address):
+#     try:
+#         # Establish a connection to the database
+#         with psycopg2.connect(
+#             dbname=POSTGRES_DBNAME,
+#             user=POSTGRES_USER,
+#             password=POSTGRES_PASSWORD,
+#             host=POSTGRES_HOST
+#         ) as conn:
+
+#             # Create a cursor object
+#             with conn.cursor() as cur:
+
+#                 # Prepare a query
+#                 query = f"SELECT token_uri FROM nfts WHERE recipient_wallet = %s"
+
+#                 # Execute the query
+#                 cur.execute(query, (wallet_address,))
+
+#                 # Fetch all rows
+#                 token_uris = cur.fetchall()
+
+#                 # Convert the result into a flat list
+#                 token_uris = [item[0] for item in token_uris]
+
+#     except Exception as e:
+#         print(f"Error: {e}")
+#         token_uris = []
+
+#     return token_uris
+
 
 
 def query_data(table_name):
-    
+    # Create a cursor object
+    cur = conn.cursor()
     try:
-        # Establish a connection to the database
-        with psycopg2.connect(
-            dbname=POSTGRES_DBNAME,
-            user=POSTGRES_USER,
-            password=POSTGRES_PASSWORD,
-            host=POSTGRES_HOST
-        ) as conn:
+        # Execute a query
+        cur.execute(f'SELECT * FROM {table_name} ORDER BY id ASC')  # add 'ORDER BY' clause here
 
-            # Create a cursor object
-            with conn.cursor() as cur:
+        # Fetch data from the cursor
+        rows = cur.fetchall()
 
-                # print('Before execute')
-                # Execute a query
-                cur.execute(f'SELECT * FROM {table_name} ORDER BY id ASC')
-                # print('After execute')
+        # Get the column names from the cursor description
+        column_names = [desc[0] for desc in cur.description]
 
-                # Fetch data from the cursor
-                rows = cur.fetchall()
-                # print('After fetchall')
-
-                # Get the column names from the cursor description
-                column_names = [desc[0] for desc in cur.description]
-
-                # Create a pandas DataFrame from the fetched data
-                df = pd.DataFrame(rows, columns=column_names)
+        # Create a pandas DataFrame from the fetched data
+        df = pd.DataFrame(rows, columns=column_names)
 
     except Exception as e:
         print(f"Error: {e}")
@@ -171,7 +158,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
         id='interval-component',
-        interval=10*1000,  # 10,000 milliseconds = 5 seconds
+        interval=60*1000,  # 10,000 milliseconds = 10 seconds
         n_intervals=0
     )
 ])
@@ -206,4 +193,4 @@ def update_tables(n):
 
 # Run the Dash app
 if __name__ == '__main__':
-    app.run_server(debug=False, host='0.0.0.0') #, host='0.0.0.0'
+    app.run_server(debug=True) #, host='0.0.0.0'
