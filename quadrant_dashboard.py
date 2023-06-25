@@ -85,6 +85,7 @@ def getNftsByWallet(wallet_address):
 
 
 def query_data(table_name):
+    
     try:
         # Establish a connection to the database
         with psycopg2.connect(
@@ -97,11 +98,14 @@ def query_data(table_name):
             # Create a cursor object
             with conn.cursor() as cur:
 
+                # print('Before execute')
                 # Execute a query
-                cur.execute(f'SELECT * FROM {table_name}')
+                cur.execute(f'SELECT * FROM {table_name} ORDER BY id ASC')
+                # print('After execute')
 
                 # Fetch data from the cursor
                 rows = cur.fetchall()
+                # print('After fetchall')
 
                 # Get the column names from the cursor description
                 column_names = [desc[0] for desc in cur.description]
@@ -116,33 +120,6 @@ def query_data(table_name):
     return df
 
 
-# def query_data(table_name):
-#     # Create a cursor object
-#     cur = conn.cursor()
-#     try:
-#         # Execute a query
-#         cur.execute(f'SELECT * FROM {table_name}')
-
-#         # Fetch data from the cursor
-#         rows = cur.fetchall()
-
-#         # Get the column names from the cursor description
-#         column_names = [desc[0] for desc in cur.description]
-
-#         # Create a pandas DataFrame from the fetched data
-#         df = pd.DataFrame(rows, columns=column_names)
-
-#         # # Check if the table is 'quad_users' and add token balance column
-#         # if table_name == 'quad_users':
-#         #     contract_address = "0x7E9B6041a9F845cd4790C97a01ef4dD1aFEC316A"
-#         #     df['token_balance'] = df['wallet_address'].apply(get_token_balance, args=(contract_address,))
-
-#     except Exception as e:
-#         print(f"Error: {e}")
-#         df = pd.DataFrame()
-
-#     return df
-    
 
 # Create a Dash application
 app = dash.Dash(__name__)
@@ -194,7 +171,7 @@ app.layout = html.Div([
     ),
     dcc.Interval(
         id='interval-component',
-        interval=5*1000,  # 10,000 milliseconds = 5 seconds
+        interval=10*1000,  # 10,000 milliseconds = 5 seconds
         n_intervals=0
     )
 ])
@@ -229,4 +206,4 @@ def update_tables(n):
 
 # Run the Dash app
 if __name__ == '__main__':
-    app.run_server(debug=True,host='0.0.0.0') #, host='0.0.0.0'
+    app.run_server(debug=True) #, host='0.0.0.0'
